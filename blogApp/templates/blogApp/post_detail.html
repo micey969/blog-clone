@@ -1,0 +1,47 @@
+{% extends 'blogApp/base.html' %}
+
+{% block content %}
+    <h1>{{ post.title }}</h1>
+    <small>By {{ post.author}} </small><br>
+    {% if post.date_published %}
+        <small>{{ post.date_published | date:"F j, Y"}}</small>
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'post_publish' pk=post.pk  %}" role="button">Publish</a>
+    {% endif %}
+    <hr><br>
+
+    <p>{{ post.text | safe | linebreaksbr }}</p>
+
+    {% if user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'post_edit' pk=post.pk  %}" role="button">
+           Edit
+        </a>
+        <a class="btn btn-danger" href="{% url 'post_remove' pk=post.pk  %}" role="button">
+            Delete
+        </a>
+    {% endif %}
+    
+    <hr>
+    <a class="btn btn-primary" href="{% url 'add_comment_to_post' pk=post.pk  %}" role="button"> Add Comment</a>
+
+    <div class="content mt-5">
+        {% for comment in post.comments.all %}
+            {% if user.is_authenticated or comment.approved_comment %}
+                <small>{{ comment.date_created }}</small>
+                {% if not comment.approved_comment %}
+                    <a class="btn btn-primary" href="{% url 'comment_approve' pk=comment.pk  %}" role="button">
+                        Approve
+                    </a>
+                    <a class="btn btn-danger" href="{% url 'comment_remove' pk=comment.pk  %}" role="button">
+                        Remove
+                    </a>
+                {% endif %}
+                <p>{{ comment.text | safe | linebreaksbr }}</p>
+                <small>Posted By: {{ comment.author }}</small>
+            {% endif %}
+            {% empty %}
+            <br><p>No Comments.</p>
+        {% endfor %}
+    </div>
+
+{% endblock%}
