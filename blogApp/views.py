@@ -21,7 +21,7 @@ class PostListView(ListView):
         query = self.request.GET.get("search")
 
         if query:
-            object_list = Post.objects.filter(Q(text__icontains=query) | Q(title__icontains=query))
+            object_list = Post.objects.filter((Q(text__icontains=query) | Q(title__icontains=query)) & Q(date_published__lte=timezone.now()))
         else:
             object_list = Post.objects.filter(date_published__lte=timezone.now()).order_by('-date_published')
         
